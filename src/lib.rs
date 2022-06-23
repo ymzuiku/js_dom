@@ -1,24 +1,32 @@
-/// # js_dom
-/// js_dom is easy use js and dom library
-/// ## Example
-/// ```rust
-/// let arg = 5;
-/// let answer = js_dom::add_one(arg);
-/// assert_eq!(6, answer);
-///
-/// let arg2 = 6;
-/// let dog2 = js_dom::add_one(arg2);
-/// assert_eq!(8, dog2);
-/// ```
-pub fn add_one(x: i32) -> i32 {
-    x + 1
-}
+#![recursion_limit = "1024"]
 
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         let result = 2 + 2;
-//         assert_eq!(result, 4);
-//     }
-// }
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+// pub use stdweb::js;
+
+// pub use wasm_bindgen::*;
+// pub use wasm_bindgen_futures::{future_to_promise, spawn_local};
+// pub use web_sys::*;
+
+pub mod depend;
+pub mod document;
+pub mod dom;
+pub mod dom_move;
+pub mod dom_ref;
+pub mod dom_weak;
+pub mod element_create;
+pub mod element_events;
+pub mod element_ob;
+pub mod element_props;
+pub mod element_query;
+pub mod element_remove;
+pub mod error;
+pub mod fetch;
+pub mod from;
+pub mod nanoid;
+pub mod object;
+pub mod prelude;
+pub mod timer;
+pub mod win;

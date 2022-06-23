@@ -1,6 +1,6 @@
 [package]
 authors = ["Pillar <ymblender@gmail.com>"]
-description = "Easy use js and dom in wasm(Don't use, its under development)."
+description = "Easy use js and dom in rust wasm(Don't use, its under development)."
 documentation = "https://docs.rs/js_dom"
 edition = "2021"
 homepage = "https://docs.rs/js_dom"
@@ -9,6 +9,49 @@ license = "MIT"
 name = "js_dom"
 version = "0.0.1"
 
+[[bin]]
+name = "hello"
+path = "examples/hello.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1"
+console_error_panic_hook = {version = "0.1.6", optional = true}
+gloo-console = "0.2.1"
+js-sys = "0.3"
+serde = {version = "1.0.115", features = ["derive"]}
+serde-wasm-bindgen = "0.4.3"
+serde_json = "1"
+# stdweb = "0.4.20"
+wasm-bindgen = {version = "0.2.78", features = ["serde-serialize"]}
+wasm-bindgen-futures = "0.4.31"
+wee_alloc = {version = "0.4.5", optional = true}
+
+[dependencies.web-sys]
+features = [
+  "Window",
+  "Document",
+  "HtmlElement",
+  "Node",
+  "Text",
+  "console",
+  "MessageEvent",
+  'AudioContext',
+  'AudioDestinationNode',
+  'AudioNode',
+  "NodeList",
+  "EventTarget",
+  "EventListener",
+  "DomTokenList",
+  "AddEventListenerOptions",
+  'AudioParam',
+  'Headers',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  "NamedNodeMap",
+  'UrlSearchParams',
+]
+version = "0.3"
