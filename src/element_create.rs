@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::depend::*;
 use crate::prelude::*;
 
@@ -5,13 +7,6 @@ use crate::prelude::*;
 pub struct Ele {
     pub ele: HtmlElement,
 }
-
-// impl Default for Ele{
-//     fn default() -> Self {
-//         id: nanoid!(),
-//         Ele::div()
-//     }
-// }
 
 pub fn document_query_all(selector: &str) -> Vec<Ele> {
     let document = doc();
@@ -25,7 +20,7 @@ pub fn document_query_all(selector: &str) -> Vec<Ele> {
 pub fn document_query(selector: &str) -> Option<Ele> {
     let document = doc();
     if let Some(ele) = document.query_selector(selector).unwrap_throw() {
-        return Some(Ele::new(ele));
+        return Some(from_element(ele));
     }
 
     None
@@ -37,210 +32,214 @@ pub fn nodelist_to_eles(nodelist: NodeList) -> Vec<Ele> {
 
     for i in 0..l {
         if let Some(node) = nodelist.get(i) {
-            list.push(Ele::new_node(node));
+            list.push(from_node(node));
         }
     }
 
     list
 }
 
-impl Ele {
-    #[inline]
-    pub fn new(target: Element) -> Self {
-        let ele: HtmlElement = target.dyn_into().unwrap_throw();
-        // match ele.get_attribute("id") {
-        //     Some(_) => {}
-        //     None => {
-        //         ele.set_id(&nanoid());
-        //     }
-        // };
+// impl Ele {
+//     #[inline]
 
-        Self { ele }
-    }
-    pub fn new_tag(tag: &str) -> Self {
-        let ele = doc().create_element(intern(tag)).unwrap_throw();
-        Ele::new(ele)
-    }
-    pub fn new_node(node: Node) -> Self {
-        let v = JsValue::from(node);
-        let ele: Element = v.dyn_into().unwrap_throw();
+// }
 
-        Ele::new(ele)
-    }
-    pub fn get_target(e: Event) -> Self {
-        let ele: Element = e.target().unwrap_throw().dyn_into().unwrap_throw();
+pub fn from_id<T: Display>(id: T) -> Ele {
+    get_element_by_id(id).unwrap_throw()
+}
 
-        Ele::new(ele)
-    }
-    pub fn get_current_target(e: Event) -> Self {
-        let ele: Element = e.current_target().unwrap_throw().dyn_into().unwrap_throw();
+pub fn from_element(target: Element) -> Ele {
+    let ele: HtmlElement = target.dyn_into().unwrap_throw();
 
-        Ele::new(ele)
-    }
+    Ele { ele }
+}
 
-    pub fn body() -> Self {
-        let body = doc().body().unwrap_throw();
-        let ele: Element = body.dyn_into().unwrap_throw();
+pub fn create_element(tag: &str) -> Ele {
+    let ele = doc().create_element(intern(tag)).unwrap_throw();
+    from_element(ele)
+}
+pub fn from_node(node: Node) -> Ele {
+    let v = JsValue::from(node);
+    let ele: Element = v.dyn_into().unwrap_throw();
 
-        Ele::new(ele)
-    }
+    from_element(ele)
+}
+pub fn from_event(e: Event) -> Ele {
+    let ele: Element = e.target().unwrap_throw().dyn_into().unwrap_throw();
 
-    pub fn div() -> Self {
-        Ele::new_tag("div")
-    }
+    from_element(ele)
+}
+pub fn get_value(e: Event) -> String {
+    from_event(e).get_value()
+}
+pub fn from_event_current(e: Event) -> Ele {
+    let ele: Element = e.current_target().unwrap_throw().dyn_into().unwrap_throw();
 
-    pub fn svg() -> Self {
-        Ele::new_tag("svg")
-    }
+    from_element(ele)
+}
 
-    pub fn input() -> Self {
-        Ele::new_tag("input")
-    }
+pub fn body() -> Ele {
+    let body = doc().body().unwrap_throw();
+    let ele: Element = body.dyn_into().unwrap_throw();
 
-    pub fn textarea() -> Self {
-        Ele::new_tag("textarea")
-    }
+    from_element(ele)
+}
 
-    pub fn header() -> Self {
-        Ele::new_tag("header")
-    }
+pub fn div() -> Ele {
+    create_element("div")
+}
 
-    pub fn strong() -> Self {
-        Ele::new_tag("strong")
-    }
-    pub fn footer() -> Self {
-        Ele::new_tag("footer")
-    }
+pub fn svg() -> Ele {
+    create_element("svg")
+}
 
-    pub fn meta() -> Self {
-        Ele::new_tag("meta")
-    }
+pub fn input() -> Ele {
+    create_element("input")
+}
 
-    pub fn style_element() -> Self {
-        Ele::new_tag("style")
-    }
+pub fn textarea() -> Ele {
+    create_element("textarea")
+}
 
-    pub fn script_element() -> Self {
-        Ele::new_tag("script")
-    }
+pub fn header() -> Ele {
+    create_element("header")
+}
 
-    pub fn template_element() -> Self {
-        Ele::new_tag("template")
-    }
+pub fn strong() -> Ele {
+    create_element("strong")
+}
+pub fn footer() -> Ele {
+    create_element("footer")
+}
 
-    pub fn link() -> Self {
-        Ele::new_tag("link")
-    }
+pub fn meta() -> Ele {
+    create_element("meta")
+}
 
-    pub fn iframe() -> Self {
-        Ele::new_tag("iframe")
-    }
+pub fn style_element() -> Ele {
+    create_element("style")
+}
 
-    pub fn p() -> Self {
-        Ele::new_tag("p")
-    }
+pub fn script_element() -> Ele {
+    create_element("script")
+}
 
-    pub fn span() -> Self {
-        Ele::new_tag("span")
-    }
-    pub fn i() -> Self {
-        Ele::new_tag("i")
-    }
+pub fn template_element() -> Ele {
+    create_element("template")
+}
 
-    pub fn kbd() -> Self {
-        Ele::new_tag("kbd")
-    }
+pub fn link() -> Ele {
+    create_element("link")
+}
 
-    pub fn button() -> Self {
-        Ele::new_tag("button")
-    }
+pub fn iframe() -> Ele {
+    create_element("iframe")
+}
 
-    pub fn nav() -> Self {
-        Ele::new_tag("nav")
-    }
+pub fn p() -> Ele {
+    create_element("p")
+}
 
-    pub fn section() -> Self {
-        Ele::new_tag("section")
-    }
+pub fn span() -> Ele {
+    create_element("span")
+}
+pub fn i() -> Ele {
+    create_element("i")
+}
 
-    pub fn label() -> Self {
-        Ele::new_tag("label")
-    }
+pub fn kbd() -> Ele {
+    create_element("kbd")
+}
 
-    pub fn form() -> Self {
-        Ele::new_tag("form")
-    }
+pub fn button() -> Ele {
+    create_element("button")
+}
 
-    pub fn aside() -> Self {
-        Ele::new_tag("aside")
-    }
+pub fn nav() -> Ele {
+    create_element("nav")
+}
 
-    pub fn article() -> Self {
-        Ele::new_tag("article")
-    }
+pub fn section() -> Ele {
+    create_element("section")
+}
 
-    pub fn menu() -> Self {
-        Ele::new_tag("menu")
-    }
+pub fn label() -> Ele {
+    create_element("label")
+}
 
-    pub fn mark() -> Self {
-        Ele::new_tag("mark")
-    }
+pub fn form() -> Ele {
+    create_element("form")
+}
 
-    pub fn dd() -> Self {
-        Ele::new_tag("dd")
-    }
+pub fn aside() -> Ele {
+    create_element("aside")
+}
 
-    pub fn dt() -> Self {
-        Ele::new_tag("dt")
-    }
+pub fn article() -> Ele {
+    create_element("article")
+}
 
-    pub fn li() -> Self {
-        Ele::new_tag("li")
-    }
+pub fn menu() -> Ele {
+    create_element("menu")
+}
 
-    pub fn ul() -> Self {
-        Ele::new_tag("ul")
-    }
+pub fn mark() -> Ele {
+    create_element("mark")
+}
 
-    pub fn ol() -> Self {
-        Ele::new_tag("ol")
-    }
+pub fn dd() -> Ele {
+    create_element("dd")
+}
 
-    pub fn code() -> Self {
-        Ele::new_tag("code")
-    }
+pub fn dt() -> Ele {
+    create_element("dt")
+}
 
-    pub fn h1() -> Self {
-        Ele::new_tag("h1")
-    }
+pub fn li() -> Ele {
+    create_element("li")
+}
 
-    pub fn h2() -> Self {
-        Ele::new_tag("h2")
-    }
+pub fn ul() -> Ele {
+    create_element("ul")
+}
 
-    pub fn h3() -> Self {
-        Ele::new_tag("h3")
-    }
-    pub fn h4() -> Self {
-        Ele::new_tag("h4")
-    }
-    pub fn h5() -> Self {
-        Ele::new_tag("h5")
-    }
-    pub fn h6() -> Self {
-        Ele::new_tag("h6")
-    }
-    pub fn table() -> Self {
-        Ele::new_tag("table")
-    }
-    pub fn tr() -> Self {
-        Ele::new_tag("tr")
-    }
-    pub fn th() -> Self {
-        Ele::new_tag("th")
-    }
-    pub fn td() -> Self {
-        Ele::new_tag("td")
-    }
+pub fn ol() -> Ele {
+    create_element("ol")
+}
+
+pub fn code() -> Ele {
+    create_element("code")
+}
+
+pub fn h1() -> Ele {
+    create_element("h1")
+}
+
+pub fn h2() -> Ele {
+    create_element("h2")
+}
+
+pub fn h3() -> Ele {
+    create_element("h3")
+}
+pub fn h4() -> Ele {
+    create_element("h4")
+}
+pub fn h5() -> Ele {
+    create_element("h5")
+}
+pub fn h6() -> Ele {
+    create_element("h6")
+}
+pub fn table() -> Ele {
+    create_element("table")
+}
+pub fn tr() -> Ele {
+    create_element("tr")
+}
+pub fn th() -> Ele {
+    create_element("th")
+}
+pub fn td() -> Ele {
+    create_element("td")
 }

@@ -2,11 +2,10 @@
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc & ::WeeAlloc::INIT;
 
 pub use js_dom::depend::*;
-// pub use js_dom::dom_move::Dom;
-pub use js_dom::dom::Dom;
+pub use js_dom::prelude::*;
 // pub use js_dom::prelude::*;
 
 #[allow(unused_imports)]
@@ -18,45 +17,114 @@ fn main() {
     app();
 }
 
-fn app() {
-    let rc_label = Dom::new_tag("div").rc();
-    let label = rc_label.clone();
-    label.set_text("222").set_style_text("font-size:100px");
+#[derive(Debug, Clone, Default)]
+struct Dog {
+    pub name: String,
+    pub age: i32,
+    pub event_id: String,
+    pub label_id: String,
+}
 
-    let label = rc_label.clone();
-    let button = Dom::new_tag("button");
-    button
-        .set_text("hello")
-        .set_style_text("background:#f00; font-size:24px;")
-        .onclick(Box::new(move |_e| {
-            label.set_text("123");
-        }));
+/// A read-only [`Signal`].
+pub struct State<T>
+where
+    T: Clone,
+{
+    pub value: RefCell<Rc<T>>,
+}
 
-    let label = rc_label.clone();
-    let input = Dom::new_tag("input");
-    input
-        .set_style_text("background:#f00; font-size:24px;")
-        .oninput(Box::new(move |e| {
-            let v = Dom::get_current_target(e).value();
-            label.set_text(&v);
-        }));
-
-    let label = rc_label.clone();
-    let input2 = Dom::new_tag("input");
-    input2
-        .set_style_text("background:#f00; font-size:24px;")
-        .oninput(Box::new(move |e| {
-            let v = Dom::get_current_target(e).value();
-            label.set_text(&v);
-        }));
-
-    let root = Dom::get_element_by_id("root").unwrap();
-
-    {
-        // let _label = label.clone();
-        // let _label2 = _label.borrow_mut();
-        root.append_child(&rc_label)
-            .append_child(&button)
-            .append_child(&input);
+impl<T> State<T>
+where
+    T: Clone,
+{
+    pub fn get(&self) -> Rc<T> {
+        self.value.borrow().clone()
     }
+    pub fn get_mut(&self) -> Rc<T> {
+        self.value.borrow_mut().clone()
+    }
+}
+
+fn use_state<T>(t: T) -> State<T>
+where
+    T: Clone,
+{
+    State {
+        value: RefCell::new(Rc::new(t)),
+    }
+}
+
+fn app() {
+    from_id("root").render(Box::new(move || {
+        let state = use_state(Dog {
+            name: "".into(),
+            age: 0,
+            event_id: nanoid(),
+            label_id: nanoid(),
+        });
+
+        let event_id = &state.get().event_id;
+        let label_id = &state.get().label_id;
+        let state1 = state.get();
+        let state2 = state.get();
+        let state3 = state.get();
+        let state4 = state.get_mut();
+        let state5 = state.get_mut();
+        let state6 = state.get();
+        let state7 = state.get_mut();
+
+        return vec![
+            div().modify(
+                event_id,
+                Box::new(move |t| {
+                    t.text(&state1.name.len().to_string())
+                        .style_text("font-size:30px; color:#f00");
+                }),
+            ),
+            div().modify(
+                event_id,
+                Box::new(move |t| {
+                    let l = state2.name.len();
+                    t.text(&l.to_string())
+                        .style_text("font-size:30px; color:#f00");
+                    println!("__debug__ {:?} {:?}", l > 15, l < 15);
+                    if l > 15 {
+                        println!("__debug__ {:?}", "111111");
+                        ele_modify(&from_id("root"), "render");
+                    }
+                }),
+            ),
+            div()
+                .text("label")
+                .style_text("font-size:100px")
+                .id(label_id),
+            input()
+                .style_text("background:#f00; font-size:24px;")
+                .oninput(Box::new(move |e| {
+                    let v = get_value(e);
+                    let label = from_id(&state3.label_id);
+                    label.text(&v);
+                    // state4.name = v;
+                    dispatch_modify(&state3.event_id);
+                })),
+            input()
+                .style_text("background:#f00; font-size:24px;")
+                .oninput(Box::new(move |e| {
+                    let v = get_value(e);
+                    let label = from_id(&state4.label_id);
+                    label.text(&v);
+                    // state5.name = v;
+                    dispatch_modify(&state4.event_id);
+                })),
+            input()
+                .style_text("background:#f00; font-size:24px;")
+                .oninput(Box::new(move |e| {
+                    let v = get_value(e);
+                    let label = from_id(&state5.label_id);
+                    label.text(&v);
+                    // state7.name = v;
+                    dispatch_modify(&state5.event_id);
+                })),
+        ];
+    }));
 }

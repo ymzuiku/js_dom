@@ -55,10 +55,10 @@ async fn fetch_example() {
     .await
     {
         Ok(res) => {
-            console_log!("__debug__", &format!("{:?}", res));
+            gloo_log!("__debug__", &format!("{:?}", res));
         }
         Err(err) => {
-            console_log!("__debug__err", &format!("{:?}", err));
+            gloo_log!("__debug__err", &format!("{:?}", err));
         }
     }
 }

@@ -3,10 +3,11 @@ authors = ["Pillar <ymblender@gmail.com>"]
 description = "Easy use js and dom in rust wasm(Don't use, its under development)."
 documentation = "https://docs.rs/js_dom"
 edition = "2021"
-homepage = "https://docs.rs/js_dom"
+homepage = "https://github.com/ymzuiku/js_dom"
 keyowrds = ["wasm", "js", "dom"]
 license = "MIT"
 name = "js_dom"
+repository = "https://github.com/ymzuiku/js_dom"
 version = "0.0.2"
 
 [[bin]]
@@ -43,6 +44,7 @@ features = [
   "NodeList",
   "EventTarget",
   "EventListener",
+  'EventInit',
   "DomTokenList",
   "AddEventListenerOptions",
   'AudioParam',
